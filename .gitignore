@@ -9,3 +9,6 @@ __pycache__/button_hendler.cpython-310.pyc
 .idea/inspectionProfiles/Project_Default.xml
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/Clop.iml
+__pycache__/text_hendler.cpython-310.pyc
+__pycache__/Replay_keyboard.cpython-310.pyc
+__pycache__/function.cpython-310.pyc

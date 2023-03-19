@@ -12,6 +12,8 @@ async def com_start(sms: ai.types.message):
                                reply_markup=Inline_keyboard.start)
     else: await bot.send_message(sms.chat.id, "Привет")
 
+import text_hendler
+
 
 if __name__ == "__main__":
     ai.executor.start_polling(bi)

@@ -10,7 +10,7 @@ class DB:
             print("Ошибка подсоединения к базе данных")
 
     def INSERT(self, TABLE, DATA_VALUES, DATA_FOR_INSERT):
-        sql = F"INSERT INTO {TABLE} VALUES({DATA_VALUES})"
+        sql = F"INSERT INTO {TABLE} VALUES{DATA_VALUES}"
         try:
             self.cur.executemany(sql, DATA_FOR_INSERT)
             self.sql.commit()
@@ -30,10 +30,12 @@ class DB:
 def check_for_availability_user(id_user):
     db = DB("Clop.db")
     data = db.SELECT("user", f"id == '{id_user}'")
-    print(data)
     if data:
-        print(1)
         return 1
     else:
-        print(0)
         return 0
+
+
+def add_user(id_user, true_name, sex, nic, photo):
+    db = DB("Clop.db")
+    db.INSERT("user", "(?, ?, ?, ?, ?)", [(id_user, true_name, sex, nic, photo)])
