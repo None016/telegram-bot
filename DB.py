@@ -1,4 +1,5 @@
 import sqlite3 as sql_l
+import global_variable as gl
 
 
 class DB:
@@ -38,4 +39,5 @@ def check_for_availability_user(id_user):
 
 def add_user(id_user, true_name, sex, nic, photo, description, sex_poisc):
     db = DB("Clop.db")
-    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?)", [(id_user, true_name, sex, nic, photo, description, sex_poisc)])
+    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?)", [(id_user, true_name, gl.converter_for_sex[sex], nic,
+                                                 photo, description, gl.converter_for_sex_poisc[sex_poisc])])
