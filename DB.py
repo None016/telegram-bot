@@ -32,17 +32,23 @@ class DB:
             self.sql.commit()
         except: print("Ошибка удаления")
 
+    def UPDATE(self, TABLE, REPLACEMENT, IF):
+        sql = f"UPDATE {TABLE} SET {REPLACEMENT} WHERE {IF};"
+        try:
+            self.cur.execute(sql)
+            self.sql.commit()
+        except: print("Ошибка обновления")
+
 
 def check_for_availability_user(id_user):
     db = DB("Clop.db")
     data = db.SELECT("user", f"id == '{id_user}'")
-    if data:
-        return 1
-    else:
-        return 0
+    if data: return 1
+    else: return 0
 
 
-def add_user(id_user, true_name, sex, nic, photo, description, sex_poisc):
+def add_user(id_user, true_name, sex, nic, photo, description, sex_poisc, location, old):
     db = DB("Clop.db")
-    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?, NULL)", [(id_user, true_name, gl.converter_for_sex[sex], nic,
-                                                       photo, description, gl.converter_for_sex_poisc[sex_poisc])])
+    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?, ?, ?)", [(id_user, true_name, gl.converter_for_sex[sex], nic,
+                                                       photo, description, gl.converter_for_sex_poisc[sex_poisc],
+                                                       location, old)])
