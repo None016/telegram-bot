@@ -13,28 +13,24 @@ async def text(sms: ai.types.Message):
         if data[0][0] != 4 and data[0][0] != -1 and data[0][0] != 6 and data[0][0] != 7 or data[0][0] == 5:
             # ^^^^^^^^^^ Исключение в виде отправления фото
             if data[0][0] == 1:     # Исключение для ввода перед полом
-                user_keys[f"{sms.chat.id}"][0][data[0][0]] = sms.text   # Запись значений в словарь
-                user_keys[f"{sms.chat.id}"][0][0] += 1      # прокрутка счетчика
+                fun.add_user_key(sms, data)
                 await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id),
                                           reply_markup=Replay_keyboard.sex_keyboard)
             elif data[0][0] == 5:
-                user_keys[f"{sms.chat.id}"][0][data[0][0]] = sms.text  # Запись значений в словарь
-                user_keys[f"{sms.chat.id}"][0][0] += 1  # прокрутка счетчика
+                fun.add_user_key(sms, data)
                 await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id),
                                           reply_markup=Replay_keyboard.search_by_gender)
             elif data[0][0] == 2:
                 if sms.text in global_variable.converter_for_sex.keys():
                     # ^^^^^^^^^^ проверка на нажатие на кнопку для дальнейшего верного преобразования
-                    user_keys[f"{sms.chat.id}"][0][data[0][0]] = sms.text  # Запись значений в словарь
-                    user_keys[f"{sms.chat.id}"][0][0] += 1  # прокрутка счетчика
+                    fun.add_user_key(sms, data)
                     await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
                 else:
                     user_keys[f"{sms.chat.id}"][0][0] = 2  # прокрутка счетчика
                     await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id),
                                               reply_markup=Replay_keyboard.sex_keyboard)
             else:
-                user_keys[f"{sms.chat.id}"][0][data[0][0]] = sms.text   # Запись значений в словарь
-                user_keys[f"{sms.chat.id}"][0][0] += 1      # прокрутка счетчика
+                fun.add_user_key(sms, data)
                 await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
         elif data[0][0] == 4:       # Исключение если пришло время для фото
             user_keys[f"{sms.chat.id}"][0][data[0][0]] = sms.photo[-1].file_id
@@ -43,8 +39,7 @@ async def text(sms: ai.types.Message):
         elif data[0][0] == 6:
             if sms.text in global_variable.converter_for_sex_poisc.keys():
                 # ^^^^^^^^^^ проверка на нажатие на кнопку для дальнейшего верного преобразования
-                user_keys[f"{sms.chat.id}"][0][data[0][0]] = sms.text
-                user_keys[f"{sms.chat.id}"][0][0] += 1
+                fun.add_user_key(sms, data)
                 await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
             else:
                 user_keys[f"{sms.chat.id}"][0][0] = 6

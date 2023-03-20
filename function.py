@@ -11,3 +11,8 @@ def input_reg(user_id):
         return phrases[0]
     else:
         return phrases[data[0] - 1]
+
+
+def add_user_key(sms, data):
+    gl.user_keys[f"{sms.chat.id}"][0][data[0][0]] = sms.text  # Запись значений в словарь
+    gl.user_keys[f"{sms.chat.id}"][0][0] += 1  # прокрутка счетчика
