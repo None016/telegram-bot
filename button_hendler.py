@@ -7,6 +7,9 @@ import function as fun
 
 @gl.bi.callback_query_handler(text="registration")
 async def registration_button(sms: ai.types.message):
+    if DB.check_for_availability_user(sms.from_user.id):
+        db = DB.DB("Clop.db")
+        db.DELETE("user", f"id == '{sms.from_user.id}'")
     gl.app_user_keys(sms.from_user.id)
     gl.user_keys[f"{sms.from_user.id}"][0][0] = 1
     await gl.bot.send_message(sms.from_user.id, fun.input_reg(sms.from_user.id))
@@ -36,9 +39,3 @@ async def back(sms: ai.types.message):
     else:
         await gl.bot.send_message(sms.from_user.id, fun.input_reg(sms.from_user.id),
                                   reply_markup=Inline_keyboard.reg_right)
-
-
-
-
-
-

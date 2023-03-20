@@ -7,16 +7,14 @@ class DB:
         try:
             self.sql = sql_l.connect(how_db)
             self.cur = self.sql.cursor()
-        except:
-            print("Ошибка подсоединения к базе данных")
+        except: print("Ошибка подсоединения к базе данных")
 
     def INSERT(self, TABLE, DATA_VALUES, DATA_FOR_INSERT):
         sql = F"INSERT INTO {TABLE} VALUES{DATA_VALUES}"
         try:
             self.cur.executemany(sql, DATA_FOR_INSERT)
             self.sql.commit()
-        except:
-            print("Ошибка добавления данных")
+        except: print("Ошибка добавления данных")
 
     def SELECT(self, TABLE, IF):
         sql = f"SELECT * FROM {TABLE} WHERE {IF}"
@@ -26,6 +24,13 @@ class DB:
         except:
             print("Ошибка выборки")
             return -1
+
+    def DELETE(self, TABLE, IF):
+        sql = f"DELETE FROM {TABLE} WHERE {IF}"
+        try:
+            self.cur.execute(sql)
+            self.sql.commit()
+        except: print("Ошибка удаления")
 
 
 def check_for_availability_user(id_user):
@@ -39,5 +44,5 @@ def check_for_availability_user(id_user):
 
 def add_user(id_user, true_name, sex, nic, photo, description, sex_poisc):
     db = DB("Clop.db")
-    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?)", [(id_user, true_name, gl.converter_for_sex[sex], nic,
-                                                 photo, description, gl.converter_for_sex_poisc[sex_poisc])])
+    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?, NULL)", [(id_user, true_name, gl.converter_for_sex[sex], nic,
+                                                       photo, description, gl.converter_for_sex_poisc[sex_poisc])])
