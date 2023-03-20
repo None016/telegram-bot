@@ -20,3 +20,6 @@ boy_poisc = types.KeyboardButton("Парни")
 girl_poisc = types.KeyboardButton("Девушки")
 doesnt_matter = types.KeyboardButton("Без разницы")
 search_by_gender.row(boy_poisc, girl_poisc, doesnt_matter)
+
+# ____________________________________________________________________________________________________________________
+
