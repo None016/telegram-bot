@@ -42,7 +42,7 @@ async def print_rec(sms):
 
 async def recommendations(sms):
     if len(gl.user_keys3[f"{sms.chat.id}"][0]) == 0:
-        print(1)
+        print(gl.user_keys3)
         db = DB.DB("Clop.db")
         my_data = db.SELECT("user", f"id == {sms.chat.id}")[0]
         if my_data[6] != 3:
@@ -53,7 +53,6 @@ async def recommendations(sms):
                                id != {sms.chat.id}) AND                           
                              (old == {my_data[8]} OR old == {my_data[8] + 1} OR old == {my_data[8] - 1})""")
         else:
-            print(100)
             data = db.SELECT("user", f"""(location_no == "{my_data[9]}" AND
                                (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
                                id != {sms.chat.id}) AND                           
@@ -66,7 +65,7 @@ async def recommendations(sms):
                     gl.user_keys3[f"{sms.chat.id}"][0].append(i[1])  # добавляем их в стек
             for i in range(6):  # заполняет стек новыми людьми
                 us = random.randint(0, len(data) - 1)
-                while data[us][0] == sms.chat.id and data[us][0] in gl.user_keys3[f"{sms.chat.id}"][0]:
+                while data[us][0] == sms.chat.id or data[us][0] in gl.user_keys3[f"{sms.chat.id}"][0]:
                     # Есть баг поправить ^^^^^^^^^^^^
                     us = random.randint(0, len(data) - 1)
                 gl.user_keys3[f"{sms.chat.id}"][0].append(data[us][0])
@@ -82,7 +81,10 @@ async def recommendations(sms):
 async def like(sms):  # функция вызывается при нажатии на лайк пользователем
     db = DB.DB("Clop.db")
     data = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
-    if data and gl.user_keys3[f"{sms.chat.id}"][1][0] == data[0][0]:  # Если есть обоюдный лайк то
+    l_us = []
+    for i in data:
+        l_us.append(i)
+    if data and l_us in gl.user_keys3[f"{sms.chat.id}"][1][0]:
         await gl.bi.bot.send_message(sms.chat.id, "Вы обоюдно понравились друг другу",
                                      # отправка последнему лакавшему ^^^^^^^^^^
                                      reply_markup=Replay_keyboard.menu)
