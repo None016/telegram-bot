@@ -17,4 +17,4 @@ import text_hendler
 
 
 if __name__ == "__main__":
-    ai.executor.start_polling(bi)
+    ai.executor.start_polling(bi, fast=True, skip_updates=True)

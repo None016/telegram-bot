@@ -59,10 +59,10 @@ async def recommendations(sms):
                              (old == {my_data[8]} OR old == {my_data[8] + 1} OR old == {my_data[8] - 1})""")
 
         if data != -1 and data:
-            like_user = db.SELECT("like_user", f"id_user1 == {sms.chat.id}")
+            like_user = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
             if like_user != -1:  # Проверям есть ли тот кто нас лайкнул
                 for i in like_user:
-                    gl.user_keys3[f"{sms.chat.id}"][0].append(i[1])  # добавляем их в стек
+                    gl.user_keys3[f"{sms.chat.id}"][0].append(i[0])  # добавляем их в стек
             for i in range(6):  # заполняет стек новыми людьми
                 us = random.randint(0, len(data) - 1)
                 while data[us][0] == sms.chat.id or data[us][0] in gl.user_keys3[f"{sms.chat.id}"][0]:
@@ -82,9 +82,10 @@ async def like(sms):  # функция вызывается при нажати�
     db = DB.DB("Clop.db")
     data = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
     l_us = []
-    for i in data:
-        l_us.append(i)
-    if data and l_us in gl.user_keys3[f"{sms.chat.id}"][1][0]:
+    if data:
+        for i in data:
+            l_us.append(i[0])
+    if data and gl.user_keys3[f"{sms.chat.id}"][1][0] in l_us:
         await gl.bi.bot.send_message(sms.chat.id, "Вы обоюдно понравились друг другу",
                                      # отправка последнему лакавшему ^^^^^^^^^^
                                      reply_markup=Replay_keyboard.menu)

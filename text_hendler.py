@@ -78,7 +78,7 @@ async def text(sms: ai.types.Message):
         user_keys3[f"{sms.chat.id}"] = [[], []]  # 1 для показа 2 для прошедших показ
         await bi.bot.send_message(sms.chat.id, "Хорошего просмотра", reply_markup=Replay_keyboard.assessment)
         await fun.recommendations(sms)
-    elif (sms.text == "💤") and DB.check_for_availability_user(sms.chat.id):  # уход в спящий режим
+    elif (sms.text == "💤") and DB.check_for_availability_user(sms.chat.id) and f"{sms.chat.id}" in user_keys3.keys():  # уход в спящий режим
         del(user_keys3[f"{sms.chat.id}"])
         await bi.bot.send_message(sms.chat.id, "Подождем пока тебя кто то лайкнит", reply_markup=Replay_keyboard.menu)
     elif (sms.text == "❤️") and f"{sms.chat.id}" in user_keys3.keys():
@@ -103,11 +103,13 @@ async def text(sms: ai.types.Message):
         elif data[0] == 2:
             db.UPDATE("user", f"location = '{sms.text}'", f"id == {sms.chat.id}")
             db.UPDATE("user", f"location_no = '{sms.text.lower()}'", f"id == {sms.chat.id}")
+            del (user_keys2[f"{sms.chat.id}"])
             await fun.print_inf_user(sms.chat.id, sms)  # Выводит информацию о пользователе
             await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
         else:
-            if sms.photo:
+            if sms.content_type == "photo":
                 db.UPDATE("user", f"photo = '{sms.photo[-1].file_id}'", f"id == {sms.chat.id}")
+                del(user_keys2[f"{sms.chat.id}"])
                 await fun.print_inf_user(sms.chat.id, sms)   # Выводит информацию о пользователе
                 await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
             else:
