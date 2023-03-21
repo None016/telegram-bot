@@ -82,7 +82,7 @@ async def recommendations(sms):
 async def like(sms):  # функция вызывается при нажатии на лайк пользователем
     db = DB.DB("Clop.db")
     data = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
-    if data:  # Если есть обоюдный лайк то
+    if data and gl.user_keys3[f"{sms.chat.id}"][1][0] == data[0][0]:  # Если есть обоюдный лайк то
         await gl.bi.bot.send_message(sms.chat.id, "Вы обоюдно понравились друг другу",
                                      # отправка последнему лакавшему ^^^^^^^^^^
                                      reply_markup=Replay_keyboard.menu)
@@ -93,6 +93,7 @@ async def like(sms):  # функция вызывается при нажати�
         data2 = db.SELECT("user", f"id == {sms.chat.id}")[0]
         await gl.bi.bot.send_photo(data[0][0], photo=data2[4],
                                    caption=f"{data2[3]}, {data2[7]}, {data2[8]}\n{data2[5]}")
+        db.DELETE("like_user", f"id_user2 == {sms.chat.id}")
         del(gl.user_keys3[f"{sms.chat.id}"])  # выводим его из поиска
         if f"{data[0][0]}" in gl.user_keys3.keys():  # выводим его из поиска если от там есть
             del (gl.user_keys3[f"{data[0][0]}"])

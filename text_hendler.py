@@ -86,6 +86,13 @@ async def text(sms: ai.types.Message):
         if f"{sms.chat.id}" in user_keys3.keys():
             await fun.recommendations(sms)
     if sms.text == "👎" and f"{sms.chat.id}" in user_keys3.keys():
+        db = DB.DB("Clop.db")
+        data4 = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
+        if data4:
+            for i in data4:
+                if i[0] == user_keys3[f"{sms.chat.id}"][1][0]:
+                    db.DELETE("like_user",
+                              f"id_user2 == {sms.chat.id} and id_user1 == {user_keys3[f'{sms.chat.id}'][1][0]}")
         await fun.recommendations(sms)
     elif f"{sms.chat.id}" in user_keys2.keys():     # Отлов для изменения анкеты
         data = user_keys2[f"{sms.chat.id}"]
