@@ -67,21 +67,25 @@ async def text(sms: ai.types.Message):
                         data[1], data[4], data[5], data[6], data[7], data[3])
             del (user_keys[f"{sms.chat.id}"])
             if sms.text == "Да":
-                await bi.bot.send_message(sms.chat.id, "temp mesage")
+                await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
 
     elif sms.text == "Изменить анкету" and DB.check_for_availability_user(sms.chat.id):
         await bi.bot.send_message(sms.chat.id, "Выберите изменения", reply_markup=Inline_keyboard.registration_two)
+    elif sms.text == "Моя анкета" and DB.check_for_availability_user(sms.chat.id):
+        await fun.print_inf_user(sms.chat.id)   # Выводит информацию о пользователе
+        await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
 
     elif f"{sms.chat.id}" in user_keys2.keys():     # Отлов для изменения анкеты
         data = user_keys2[f"{sms.chat.id}"]
         db = DB.DB("Clop.db")
         if data[0] != 3:
             fun.update_reg(sms, db, converter_for_re_registration[data[0]])
-            await fun.print_inf_user(sms.chat.id)
+            await fun.print_inf_user(sms.chat.id)  # Выводит информацию о пользователе
         else:
             if sms.photo:
                 db.UPDATE("user", f"photo = '{sms.photo[-1].file_id}'", f"id == {sms.chat.id}")
-                await fun.print_inf_user(sms.chat.id)
+                await fun.print_inf_user(sms.chat.id)   # Выводит информацию о пользователе
+                await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
             else:
                 await bi.bot.send_message(sms.chat.id, "Отправте свое фото")
 

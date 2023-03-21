@@ -23,3 +23,10 @@ search_by_gender.row(boy_poisc, girl_poisc, doesnt_matter)
 
 # ____________________________________________________________________________________________________________________
 
+menu = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+Change_profile = types.KeyboardButton("Изменить анкету")
+View_profile = types.KeyboardButton("🚀Лента🚀")
+My_profile = types.KeyboardButton("Моя анкета")
+menu.row(Change_profile, View_profile)
+menu.row(My_profile)
+
