@@ -26,28 +26,76 @@ def update_reg(sms, db, column):
     del(gl.user_keys2[f"{sms.chat.id}"])
 
 
-async def print_inf_user(id):
+async def print_inf_user(id, sms):
     db = DB.DB("Clop.db")
     data = db.SELECT("user", f"id == {id}")[0]
-    await gl.bi.bot.send_photo(id, photo=data[4], caption=f"{data[3]}, {data[7]}, {data[8]}\n{data[5]}")
+    await gl.bi.bot.send_photo(sms.chat.id, photo=data[4], caption=f"{data[3]}, {data[7]}, {data[8]}\n{data[5]}")
+
+
+async def print_rec(sms):
+    await print_inf_user(gl.user_keys3[f"{sms.chat.id}"][0][0], sms)
+    gl.user_keys3[f"{sms.chat.id}"][1].append(gl.user_keys3[f"{sms.chat.id}"][0][0])
+    del (gl.user_keys3[f"{sms.chat.id}"][0][0])
+    if len(gl.user_keys3[f"{sms.chat.id}"][1]) >= 2:
+        del (gl.user_keys3[f"{sms.chat.id}"][1][0])
 
 
 async def recommendations(sms):
-    db = DB.DB("Clop.db")
-    my_data = db.SELECT("user", f"id == {sms.chat.id}")[0]
-    if my_data[6] != 3:
-        data = db.SELECT("user",
-                         f"""(sex == {my_data[6]} AND
-                          location_no == "{my_data[9]}" AND
-                           sex_poisc == {my_data[2]} AND
-                           id != {sms.chat.id}) AND                           
-                         (old == {my_data[8]} OR old == {my_data[8] + 1} OR old == {my_data[8] - 1})""")
+    if len(gl.user_keys3[f"{sms.chat.id}"][0]) == 0:
+        print(1)
+        db = DB.DB("Clop.db")
+        my_data = db.SELECT("user", f"id == {sms.chat.id}")[0]
+        if my_data[6] != 3:
+            data = db.SELECT("user",
+                             f"""(sex == {my_data[6]} AND
+                              location_no == "{my_data[9]}" AND
+                               (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
+                               id != {sms.chat.id}) AND                           
+                             (old == {my_data[8]} OR old == {my_data[8] + 1} OR old == {my_data[8] - 1})""")
+        else:
+            print(100)
+            data = db.SELECT("user", f"""(location_no == "{my_data[9]}" AND
+                               (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
+                               id != {sms.chat.id}) AND                           
+                             (old == {my_data[8]} OR old == {my_data[8] + 1} OR old == {my_data[8] - 1})""")
+
         if data != -1 and data:
-            us = random.randint(0, len(data) - 1)
-            await gl.bi.bot.send_photo(sms.chat.id,
-                                       photo=data[us][4],
-                                       caption=f"{data[us][3]}, {data[us][7]}, {data[us][8]}\n{data[us][5]}",
-                                       reply_markup=Replay_keyboard.assessment)
+            like_user = db.SELECT("like_user", f"id_user1 == {sms.chat.id}")
+            if like_user != -1:  # Проверям есть ли тот кто нас лайкнул
+                for i in like_user:
+                    gl.user_keys3[f"{sms.chat.id}"][0].append(i[1])  # добавляем их в стек
+            for i in range(6):  # заполняет стек новыми людьми
+                us = random.randint(0, len(data) - 1)
+                while data[us][0] == sms.chat.id and data[us][0] in gl.user_keys3[f"{sms.chat.id}"][0]:
+                    # Есть баг поправить ^^^^^^^^^^^^
+                    us = random.randint(0, len(data) - 1)
+                gl.user_keys3[f"{sms.chat.id}"][0].append(data[us][0])
+            await print_rec(sms)
+
         else:
             await gl.bi.bot.send_message(sms.chat.id,
                                          "К сожалению на данных момент нет пользователей удовлетворяющие вашим характеристикам")
+    else:
+        await print_rec(sms)
+
+
+async def like(sms):  # функция вызывается при нажатии на лайк пользователем
+    db = DB.DB("Clop.db")
+    data = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
+    if data:  # Если есть обоюдный лайк то
+        await gl.bi.bot.send_message(sms.chat.id, "Вы обоюдно понравились друг другу",
+                                     # отправка последнему лакавшему ^^^^^^^^^^
+                                     reply_markup=Replay_keyboard.menu)
+        await print_inf_user(data[0][0], sms)
+        await gl.bi.bot.send_message(data[0][0], "Вы обоюдно понравились друг другу",
+                                     # отправка кого лайкнули ^^^^^^^^^^^
+                                     reply_markup=Replay_keyboard.menu)
+        data2 = db.SELECT("user", f"id == {sms.chat.id}")[0]
+        await gl.bi.bot.send_photo(data[0][0], photo=data2[4],
+                                   caption=f"{data2[3]}, {data2[7]}, {data2[8]}\n{data2[5]}")
+        del(gl.user_keys3[f"{sms.chat.id}"])  # выводим его из поиска
+        if f"{data[0][0]}" in gl.user_keys3.keys():  # выводим его из поиска если от там есть
+            del (gl.user_keys3[f"{data[0][0]}"])
+    else:
+        db.INSERT("like_user", "(?, ?)", [(sms.chat.id, gl.user_keys3[f"{sms.chat.id}"][1][0])])
+        # Записываем в базу кого лайкнули ^^^^^^^^^^^^

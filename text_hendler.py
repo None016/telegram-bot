@@ -72,26 +72,36 @@ async def text(sms: ai.types.Message):
     elif sms.text == "Изменить анкету" and DB.check_for_availability_user(sms.chat.id):
         await bi.bot.send_message(sms.chat.id, "Выберите изменения", reply_markup=Inline_keyboard.registration_two)
     elif sms.text == "Моя анкета" and DB.check_for_availability_user(sms.chat.id):
-        await fun.print_inf_user(sms.chat.id)   # Выводит информацию о пользователе
+        await fun.print_inf_user(sms.chat.id, sms)   # Выводит информацию о пользователе
         await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
-    elif (sms.text == "🚀Лента🚀" or sms.text == "❤️" or sms.text == "👎") and DB.check_for_availability_user(sms.chat.id):
+    elif (sms.text == "🚀Лента🚀") and DB.check_for_availability_user(sms.chat.id):
+        user_keys3[f"{sms.chat.id}"] = [[], []]  # 1 для показа 2 для прошедших показ
+        await bi.bot.send_message(sms.chat.id, "Хорошего просмотра", reply_markup=Replay_keyboard.assessment)
         await fun.recommendations(sms)
-
+    elif (sms.text == "💤") and DB.check_for_availability_user(sms.chat.id):  # уход в спящий режим
+        del(user_keys3[f"{sms.chat.id}"])
+        await bi.bot.send_message(sms.chat.id, "Подождем пока тебя кто то лайкнит", reply_markup=Replay_keyboard.menu)
+    elif (sms.text == "❤️") and f"{sms.chat.id}" in user_keys3.keys():
+        await fun.like(sms)
+        if f"{sms.chat.id}" in user_keys3.keys():
+            await fun.recommendations(sms)
+    if sms.text == "👎" and f"{sms.chat.id}" in user_keys3.keys():
+        await fun.recommendations(sms)
     elif f"{sms.chat.id}" in user_keys2.keys():     # Отлов для изменения анкеты
         data = user_keys2[f"{sms.chat.id}"]
         db = DB.DB("Clop.db")
-        if data[0] != 3:
+        if data[0] != 3 and data[0] != 2:
             fun.update_reg(sms, db, converter_for_re_registration[data[0]])
-            await fun.print_inf_user(sms.chat.id)  # Выводит информацию о пользователе
+            await fun.print_inf_user(sms.chat.id, sms)  # Выводит информацию о пользователе
         elif data[0] == 2:
             db.UPDATE("user", f"location = '{sms.text}'", f"id == {sms.chat.id}")
             db.UPDATE("user", f"location_no = '{sms.text.lower()}'", f"id == {sms.chat.id}")
-            await fun.print_inf_user(sms.chat.id)  # Выводит информацию о пользователе
+            await fun.print_inf_user(sms.chat.id, sms)  # Выводит информацию о пользователе
             await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
         else:
             if sms.photo:
                 db.UPDATE("user", f"photo = '{sms.photo[-1].file_id}'", f"id == {sms.chat.id}")
-                await fun.print_inf_user(sms.chat.id)   # Выводит информацию о пользователе
+                await fun.print_inf_user(sms.chat.id, sms)   # Выводит информацию о пользователе
                 await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
             else:
                 await bi.bot.send_message(sms.chat.id, "Отправте свое фото")
