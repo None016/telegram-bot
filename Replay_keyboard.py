@@ -21,7 +21,7 @@ girl_poisc = types.KeyboardButton("Девушки")
 doesnt_matter = types.KeyboardButton("Без разницы")
 search_by_gender.row(boy_poisc, girl_poisc, doesnt_matter)
 
-# ____________________________________________________________________________________________________________________
+# _____________________________________________________________________________________________________________________
 
 menu = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 Change_profile = types.KeyboardButton("Изменить анкету")
@@ -30,3 +30,9 @@ My_profile = types.KeyboardButton("Моя анкета")
 menu.row(Change_profile, View_profile)
 menu.row(My_profile)
 
+# _____________________________________________________________________________________________________________________
+
+assessment = types.ReplyKeyboardMarkup(resize_keyboard=True)
+lick_p = types.KeyboardButton("❤️")
+diz_lick_p = types.KeyboardButton("👎")
+assessment.row(lick_p, diz_lick_p)

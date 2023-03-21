@@ -49,6 +49,6 @@ def check_for_availability_user(id_user):
 
 def add_user(id_user, true_name, sex, nic, photo, description, sex_poisc, location, old):
     db = DB("Clop.db")
-    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?, ?, ?)", [(id_user, true_name, gl.converter_for_sex[sex], nic,
+    db.INSERT("user", "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [(id_user, true_name, gl.converter_for_sex[sex], nic,
                                                        photo, description, gl.converter_for_sex_poisc[sex_poisc],
-                                                       location, old)])
+                                                       location, old, location.lower())])
