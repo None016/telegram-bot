@@ -31,9 +31,13 @@ async def text(sms: ai.types.Message):
             await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
 
         elif data[0] == 4:       # Исключение если пришло время для фото
-            user_keys[f"{sms.chat.id}"][0][data[0]] = sms.photo[-1].file_id
-            user_keys[f"{sms.chat.id}"][0][0] += 1
-            await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
+            if sms.photo:
+                user_keys[f"{sms.chat.id}"][0][data[0]] = sms.photo[-1].file_id
+                user_keys[f"{sms.chat.id}"][0][0] += 1
+                await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
+            else:
+                user_keys[f"{sms.chat.id}"][0][0] = 4
+                await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
 
         elif data[0] == 5:
             fun.add_user_key(sms, data)
@@ -75,6 +79,9 @@ async def text(sms: ai.types.Message):
             fun.update_reg(sms, db, converter_for_re_registration[data[0]])
             await fun.print_inf_user(sms.chat.id)
         else:
-            db.UPDATE("user", f"photo = '{sms.photo[-1].file_id}'", f"id == {sms.chat.id}")
-            await fun.print_inf_user(sms.chat.id)
+            if sms.photo:
+                db.UPDATE("user", f"photo = '{sms.photo[-1].file_id}'", f"id == {sms.chat.id}")
+                await fun.print_inf_user(sms.chat.id)
+            else:
+                await bi.bot.send_message(sms.chat.id, "Отправте свое фото")
 
