@@ -34,13 +34,18 @@ async def text(sms: ai.types.Message):
             if sms.photo:
                 user_keys[f"{sms.chat.id}"][0][data[0]] = sms.photo[-1].file_id
                 user_keys[f"{sms.chat.id}"][0][0] += 1
-                await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
+                await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id),
+                                          reply_markup=Replay_keyboard.skip_description)
             else:
                 user_keys[f"{sms.chat.id}"][0][0] = 4
                 await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
 
         elif data[0] == 5:
-            fun.add_user_key(sms, data)
+            if sms.text == "Оставить описание пустым":
+                user_keys[f"{sms.chat.id}"][0][data[0]] = " "  # Запись значений в словарь
+                user_keys[f"{sms.chat.id}"][0][0] += 1  # прокрутка счетчика
+            else:
+                fun.add_user_key(sms, data)
             await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id),
                                       reply_markup=Replay_keyboard.search_by_gender)
 

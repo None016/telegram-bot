@@ -37,3 +37,10 @@ lick_p = types.KeyboardButton("❤️")
 diz_lick_p = types.KeyboardButton("👎")
 slip = types.KeyboardButton("💤")
 assessment.row(lick_p, slip, diz_lick_p)
+
+# _____________________________________________________________________________________________________________________
+
+skip_description = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+skip = types.KeyboardButton("Оставить описание пустым")
+skip_description.row(skip)
+
