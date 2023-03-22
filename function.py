@@ -45,19 +45,24 @@ async def recommendations(sms):
         print(gl.user_keys3)
         db = DB.DB("Clop.db")
         my_data = db.SELECT("user", f"id == {sms.chat.id}")[0]
+        age_difference = 1
+        data = []
         if my_data[6] != 3:
-            data = db.SELECT("user",
-                             f"""(sex == {my_data[6]} AND
-                              location_no == "{my_data[9]}" AND
-                               (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                               id != {sms.chat.id}) AND                           
-                             (old == {my_data[8]} OR old == {my_data[8] + 1} OR old == {my_data[8] - 1})""")
+            while len(data) <= 6:
+                data = db.SELECT("user",
+                                 f"""(sex == {my_data[6]} AND
+                                  location_no == "{my_data[9]}" AND
+                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
+                                   id != {sms.chat.id}) AND                           
+                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND old >= {my_data[8] - age_difference}))""")
+                age_difference += 1
         else:
-            data = db.SELECT("user", f"""(location_no == "{my_data[9]}" AND
-                               (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                               id != {sms.chat.id}) AND                           
-                             (old == {my_data[8]} OR old == {my_data[8] + 1} OR old == {my_data[8] - 1})""")
-
+            while len(data) <= 6:
+                data = db.SELECT("user", f"""(location_no == "{my_data[9]}" AND
+                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
+                                   id != {sms.chat.id}) AND                           
+                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND old >= {my_data[8] - age_difference}))""")
+                age_difference += 1
         if data != -1 and data:
             like_user = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
             if like_user != -1:  # Проверям есть ли тот кто нас лайкнул
