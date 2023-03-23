@@ -120,3 +120,7 @@ async def like(sms):  # функция вызывается при нажати�
     else:
         db.INSERT("like_user", "(?, ?)", [(sms.chat.id, gl.user_keys3[f"{sms.chat.id}"][1][0])])
         # Записываем в базу кого лайкнули ^^^^^^^^^^^^
+
+
+def location(loc_lat1, loc_long1, loc_lat2, loc_long2):
+    return ((abs((loc_lat1 - loc_lat2) ** 2) + abs((loc_long1 - loc_long2) ** 2)) ** 0.5) * 111_000

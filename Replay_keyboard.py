@@ -44,3 +44,8 @@ skip_description = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyb
 skip = types.KeyboardButton("Оставить описание пустым")
 skip_description.row(skip)
 
+# _____________________________________________________________________________________________________________________
+
+location = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+position = types.KeyboardButton("📌Отправить свою позицию📌", request_location=True)
+location.row(position)

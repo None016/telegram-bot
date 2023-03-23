@@ -6,7 +6,7 @@ import Replay_keyboard
 import DB
 
 
-@bi.message_handler(content_types=["text", "photo"])
+@bi.message_handler(content_types=["text", "photo", "location"])
 async def text(sms: ai.types.Message):
     if f"{sms.chat.id}" in user_keys.keys():
         data = user_keys[f"{sms.chat.id}"][0]
@@ -53,14 +53,23 @@ async def text(sms: ai.types.Message):
             if sms.text in global_variable.converter_for_sex_poisc.keys():
                 # ^^^^^^^^^^ проверка на нажатие на кнопку для дальнейшего верного преобразования
                 fun.add_user_key(sms, data)
-                await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id))
+                await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id),
+                                          reply_markup=Replay_keyboard.location)
             else:
                 user_keys[f"{sms.chat.id}"][0][0] = 6
                 await bi.bot.send_message(sms.chat.id, fun.input_reg(sms.chat.id),
                                           reply_markup=Replay_keyboard.search_by_gender)
 
         elif data[0] == 7:
-            user_keys[f"{sms.chat.id}"][0][data[0]] = sms.text  # Запись значений в словарь
+            print(sms)
+            if sms["location"]:
+                user_keys[f"{sms.chat.id}"][0][8] = sms["location"]["latitude"]
+                user_keys[f"{sms.chat.id}"][0][9] = sms["location"]["longitude"]
+                user_keys[f"{sms.chat.id}"][0][data[0]] = "000"
+            else:
+                user_keys[f"{sms.chat.id}"][0][data[0]] = sms.text  # Запись значений в словарь
+                user_keys[f"{sms.chat.id}"][0][8] = -404
+                user_keys[f"{sms.chat.id}"][0][9] = -404
             user_keys[f"{sms.chat.id}"][0][0] = -1
             await bi.bot.send_photo(sms.chat.id, photo=data[4],
                                     caption=f"{data[1]}, {data[2]}, {data[3]} \n{data[5]}")
@@ -69,7 +78,7 @@ async def text(sms: ai.types.Message):
 
         elif data[0] == -1:
             DB.add_user(sms.chat.id, sms["from"]["first_name"], data[2],
-                        data[1], data[4], data[5], data[6], data[7], data[3])
+                        data[1], data[4], data[5], data[6], data[7], data[3], data[8], data[9])
             del (user_keys[f"{sms.chat.id}"])
             if sms.text == "Да":
                 await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
@@ -119,4 +128,3 @@ async def text(sms: ai.types.Message):
                 await bot.send_message(sms.chat.id, "Выбери действие", reply_markup=Replay_keyboard.menu)
             else:
                 await bi.bot.send_message(sms.chat.id, "Отправте свое фото")
-
