@@ -47,43 +47,60 @@ async def recommendations(sms):
         my_data = db.SELECT("user", f"id == {sms.chat.id}")[0]
         age_difference = 1
         data = []
-        if my_data[6] != 3:
+        if my_data[6] != 3 and my_data[9] != "000":
             while len(data) <= 6:
-                print(1)
                 data = db.SELECT("user",
                                  f"""(sex == {my_data[6]} AND
                                   location_no == "{my_data[9]}" AND
                                    (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
                                    id != {sms.chat.id}) AND                           
-                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND old >= {my_data[8] - age_difference}))""")
+                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
+                                  old >= {my_data[8] - age_difference}))""")
                 age_difference += 1
                 if age_difference >= 15:
                     data = []
                     break
-        else:
+        elif my_data[6] == 3 and my_data[9] != "000":
             while len(data) <= 6:
-                print(2)
                 data = db.SELECT("user", f"""(location_no == "{my_data[9]}" AND
                                    (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
                                    id != {sms.chat.id}) AND                           
-                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND old >= {my_data[8] - age_difference}))""")
+                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
+                                  old >= {my_data[8] - age_difference}))""")
+                age_difference += 1
+                if age_difference >= 15:
+                    data = []
+                    break
+        elif my_data[6] == 3 and my_data[9] == "000":
+            gl.user_location[f"{sms.chat.id}"] = [my_data[10], my_data[11]]
+            while len(data) <= 6:
+                data = db.SELECT("user", f"""(location_no == "000" AND
+                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
+                                   id != {sms.chat.id}) AND                           
+                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
+                                  old >= {my_data[8] - age_difference})) AND
+                                  (loc_lat <= {my_data[10] + 0.01} AND loc_lat >= {my_data[10] - 0.01} AND
+                                  loc_long <= {my_data[11] + 0.01} AND loc_long >= {my_data[11] - 0.01})""")
                 age_difference += 1
                 if age_difference >= 15:
                     data = []
                     break
 
         if data != -1 and data:
-            print(3)
             like_user = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
             if like_user != -1:  # Проверям есть ли тот кто нас лайкнул
                 for i in like_user:
                     gl.user_keys3[f"{sms.chat.id}"][0].append(i[0])  # добавляем их в стек
+
             for i in range(6):  # заполняет стек новыми людьми
                 us = random.randint(0, len(data) - 1)
+                counter = 0
                 while data[us][0] == sms.chat.id or data[us][0] in gl.user_keys3[f"{sms.chat.id}"][0]:
-                    print(5)
+                    counter += 1
                     # Есть баг поправить ^^^^^^^^^^^^
                     us = random.randint(0, len(data) - 1)
+                    if counter >= 15:
+                        break
                 gl.user_keys3[f"{sms.chat.id}"][0].append(data[us][0])
             await print_rec(sms)
 
@@ -92,7 +109,18 @@ async def recommendations(sms):
                                          "К сожалению на данных момент нет пользователей удовлетворяющие вашим характеристикам",
                                          reply_markup=Replay_keyboard.menu)
     else:
-        await print_rec(sms)
+        if f"{sms.chat.id}" in gl.user_location.keys():
+            db = DB.DB("Clop.db")
+            data = db.SELECT("user", f"id == {gl.user_keys3[f'{sms.chat.id}'][0][0]}")[0]
+            temp = gl.user_location[f"{sms.chat.id}"]
+            await gl.bi.bot.send_photo(sms.chat.id, photo=data[4],
+                                       caption=f"{data[3]}, {location(temp[0], temp[1], data[10], data[11])}, {data[8]}\n{data[5]}")
+            gl.user_keys3[f"{sms.chat.id}"][1].append(gl.user_keys3[f"{sms.chat.id}"][0][0])
+            del (gl.user_keys3[f"{sms.chat.id}"][0][0])
+            if len(gl.user_keys3[f"{sms.chat.id}"][1]) >= 2:
+                del (gl.user_keys3[f"{sms.chat.id}"][1][0])
+        else:
+            await print_rec(sms)
 
 
 async def like(sms):  # функция вызывается при нажатии на лайк пользователем
