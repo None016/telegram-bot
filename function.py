@@ -85,6 +85,20 @@ async def recommendations(sms):
                 if age_difference >= 15:
                     data = []
                     break
+        elif my_data[6] != 3 and my_data[9] == "000":
+            gl.user_location[f"{sms.chat.id}"] = [my_data[10], my_data[11]]
+            while len(data) <= 6:
+                data = db.SELECT("user", f"""(sex == {my_data[6]} AND location_no == "000" AND
+                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
+                                   id != {sms.chat.id}) AND                           
+                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
+                                  old >= {my_data[8] - age_difference})) AND
+                                  (loc_lat <= {my_data[10] + 0.01} AND loc_lat >= {my_data[10] - 0.01} AND
+                                  loc_long <= {my_data[11] + 0.01} AND loc_long >= {my_data[11] - 0.01})""")
+                age_difference += 1
+                if age_difference >= 15:
+                    data = []
+                    break
 
         if data != -1 and data:
             like_user = db.SELECT("like_user", f"id_user2 == {sms.chat.id}")
