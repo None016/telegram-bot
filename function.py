@@ -44,58 +44,49 @@ async def recommendations(sms):
     if len(gl.user_keys3[f"{sms.chat.id}"][0]) == 0:
         print(gl.user_keys3)
         db = DB.DB("Clop.db")
+
         my_data = db.SELECT("user", f"id == {sms.chat.id}")[0]
+
         age_difference = 1
         data = []
-        if my_data[6] != 3 and my_data[9] != "000":
+        if my_data[6] != 3 and my_data[9] != "000":  # Если важен пол и неизвестны координаты
+
+            while len(data) <= 6:  # Цикл набирает нужное число пользователей изменяя возраст
+                data = db.SELECT("user", gl.conditions_select_1(my_data, sms, age_difference))
+                age_difference += 1  # Защита от вечного цикла
+
+                if age_difference >= 15:  # Если цикл повторился 15 раз
+                    data = []  # то цикл прерывается и возвращает пустое значение
+                    break
+
+        elif my_data[6] == 3 and my_data[9] != "000":  # Если пол не важен и неизвестны координаты
+
             while len(data) <= 6:
-                data = db.SELECT("user",
-                                 f"""(sex == {my_data[6]} AND
-                                  location_no == "{my_data[9]}" AND
-                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                                   id != {sms.chat.id}) AND                           
-                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
-                                  old >= {my_data[8] - age_difference}))""")
+                data = db.SELECT("user", gl.conditions_select_2(my_data, sms, age_difference))
                 age_difference += 1
+
                 if age_difference >= 15:
                     data = []
                     break
-        elif my_data[6] == 3 and my_data[9] != "000":
+
+        elif my_data[6] == 3 and my_data[9] == "000":  # Если пол не важен и известны координаты
+            gl.user_location[f"{sms.chat.id}"] = [my_data[10], my_data[11]]  # Добавляем в словарь свои координаты
+
             while len(data) <= 6:
-                data = db.SELECT("user", f"""(location_no == "{my_data[9]}" AND
-                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                                   id != {sms.chat.id}) AND                           
-                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
-                                  old >= {my_data[8] - age_difference}))""")
+                data = db.SELECT("user", gl.conditions_select_3(my_data, sms, age_difference))
                 age_difference += 1
+
                 if age_difference >= 15:
                     data = []
                     break
-        elif my_data[6] == 3 and my_data[9] == "000":
-            gl.user_location[f"{sms.chat.id}"] = [my_data[10], my_data[11]]
+
+        elif my_data[6] != 3 and my_data[9] == "000":  # Если пол важен и известны координаты
+            gl.user_location[f"{sms.chat.id}"] = [my_data[10], my_data[11]]    # Добавляем в словарь свои координаты
+
             while len(data) <= 6:
-                data = db.SELECT("user", f"""(location_no == "000" AND
-                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                                   id != {sms.chat.id}) AND                           
-                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
-                                  old >= {my_data[8] - age_difference})) AND
-                                  (loc_lat <= {my_data[10] + 0.01} AND loc_lat >= {my_data[10] - 0.01} AND
-                                  loc_long <= {my_data[11] + 0.01} AND loc_long >= {my_data[11] - 0.01})""")
+                data = db.SELECT("user", gl.conditions_select_4(my_data, sms, age_difference))
                 age_difference += 1
-                if age_difference >= 15:
-                    data = []
-                    break
-        elif my_data[6] != 3 and my_data[9] == "000":
-            gl.user_location[f"{sms.chat.id}"] = [my_data[10], my_data[11]]
-            while len(data) <= 6:
-                data = db.SELECT("user", f"""(sex == {my_data[6]} AND location_no == "000" AND
-                                   (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                                   id != {sms.chat.id}) AND                           
-                                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
-                                  old >= {my_data[8] - age_difference})) AND
-                                  (loc_lat <= {my_data[10] + 0.01} AND loc_lat >= {my_data[10] - 0.01} AND
-                                  loc_long <= {my_data[11] + 0.01} AND loc_long >= {my_data[11] - 0.01})""")
-                age_difference += 1
+
                 if age_difference >= 15:
                     data = []
                     break
