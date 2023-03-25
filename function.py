@@ -116,7 +116,19 @@ async def recommendations(sms):
                     if counter >= 15:
                         break
                 gl.user_keys3[f"{sms.chat.id}"][0].append(data[us][0])
-            await print_rec(sms)
+            if my_data[9] == "000":  # если известного его место положение
+                db = DB.DB("Clop.db")
+                data = db.SELECT("user", f"id == {gl.user_keys3[f'{sms.chat.id}'][0][0]}")[0]
+                temp = gl.user_location[f"{sms.chat.id}"]
+                await gl.bi.bot.send_photo(sms.chat.id, photo=data[4],
+                                           caption=f"{data[3]}, {location(temp[0], temp[1], data[10], data[11])}м, {data[8]}\n{data[5]}")
+                gl.user_keys3[f"{sms.chat.id}"][1].append(gl.user_keys3[f"{sms.chat.id}"][0][0])
+                del (gl.user_keys3[f"{sms.chat.id}"][0][0])
+
+                if len(gl.user_keys3[f"{sms.chat.id}"][1]) >= 2:
+                    del (gl.user_keys3[f"{sms.chat.id}"][1][0])
+            else:
+                await print_rec(sms)
 
         else:
             await gl.bi.bot.send_message(sms.chat.id,
@@ -128,9 +140,10 @@ async def recommendations(sms):
             data = db.SELECT("user", f"id == {gl.user_keys3[f'{sms.chat.id}'][0][0]}")[0]
             temp = gl.user_location[f"{sms.chat.id}"]
             await gl.bi.bot.send_photo(sms.chat.id, photo=data[4],
-                                       caption=f"{data[3]}, {location(temp[0], temp[1], data[10], data[11])}, {data[8]}\n{data[5]}")
+                                       caption=f"{data[3]}, {location(temp[0], temp[1], data[10], data[11])}м, {data[8]}\n{data[5]}")
             gl.user_keys3[f"{sms.chat.id}"][1].append(gl.user_keys3[f"{sms.chat.id}"][0][0])
             del (gl.user_keys3[f"{sms.chat.id}"][0][0])
+
             if len(gl.user_keys3[f"{sms.chat.id}"][1]) >= 2:
                 del (gl.user_keys3[f"{sms.chat.id}"][1][0])
         else:
@@ -165,4 +178,4 @@ async def like(sms):  # функция вызывается при нажати�
 
 
 def location(loc_lat1, loc_long1, loc_lat2, loc_long2):
-    return ((abs((loc_lat1 - loc_lat2) ** 2) + abs((loc_long1 - loc_long2) ** 2)) ** 0.5) * 111_000
+    return int(((abs((loc_lat1 - loc_lat2) ** 2) + abs((loc_long1 - loc_long2) ** 2)) ** 0.5) * 111_000)
