@@ -55,13 +55,6 @@ async def back(sms: ai.types.message):
     await gl.bot.send_message(sms.from_user.id, "Введите описание")
 
 
-@gl.bi.callback_query_handler(text="re_location")
-async def back(sms: ai.types.message):
-    gl.app_user_keys2(sms.from_user.id)
-    gl.user_keys2[f"{sms.from_user.id}"][0] = 2
-    await gl.bot.send_message(sms.from_user.id, "Введите местоположения")
-
-
 @gl.bi.callback_query_handler(text="re_photo")
 async def back(sms: ai.types.message):
     gl.app_user_keys2(sms.from_user.id)

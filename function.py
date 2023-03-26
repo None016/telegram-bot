@@ -7,7 +7,8 @@ import Replay_keyboard
 def input_reg(user_id):
     data = gl.user_keys[f"{user_id}"][0]
     phrases = ["Как тебя зовут?", "Твой пол", "Сколько тебе лет?", "Отправь свое фото",
-               "Напиши немного о себе", "Кто тебе интересен?", "Откуда ты?"]
+               "Напиши немного о себе", "Кто тебе интересен?",
+               "Откуда ты?(Напиши свой город или отправь свое местоположение)"]
     if data[0] >= 7:
         return phrases[6]
     if data[0] <= 1:
@@ -42,7 +43,6 @@ async def print_rec(sms):
 
 async def recommendations(sms):
     if len(gl.user_keys3[f"{sms.chat.id}"][0]) == 0:
-        print(gl.user_keys3)
         db = DB.DB("Clop.db")
 
         my_data = db.SELECT("user", f"id == {sms.chat.id}")[0]
@@ -170,3 +170,8 @@ async def like(sms):  # функция вызывается при нажати�
 
 def location(loc_lat1, loc_long1, loc_lat2, loc_long2):
     return int(((abs((loc_lat1 - loc_lat2) ** 2) + abs((loc_long1 - loc_long2) ** 2)) ** 0.5) * 111_000)
+
+
+async def wrong_data_type(namber, sms):
+    gl.user_keys[f"{sms.chat.id}"][0][0] = namber
+    await gl.bi.bot.send_message(sms.chat.id, input_reg(sms.chat.id))
