@@ -24,26 +24,29 @@ def app_user_keys2(user_id):
 
 
 def conditions_select_1(my_data, sms, age_difference):  # Нужно оптимизировать
-    return f'''(sex == {my_data[6]} AND
+    print(1)
+    return f'''sex == {my_data[6]} AND
                 location_no == "{my_data[9]}" AND
                 (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                id != {sms.chat.id}) AND                           
+                id != {sms.chat.id} AND                           
                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
                 old >= {my_data[8] - age_difference}))'''
 
 
 def conditions_select_2(my_data, sms, age_difference):  # Нужно оптимизировать
-    return f'''(location_no == "{my_data[9]}" AND
+    print(2)
+    return f'''location_no == "{my_data[9]}" AND
                 (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                id != {sms.chat.id}) AND                           
+                id != {sms.chat.id} AND                           
                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
                 old >= {my_data[8] - age_difference}))'''
 
 
 def conditions_select_3(my_data, sms, age_difference):  # Нужно оптимизировать
-    return f'''(location_no == "000" AND
+    print(3)
+    return f'''location_no == "000" AND
                 (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                id != {sms.chat.id}) AND                           
+                id != {sms.chat.id} AND                           
                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
                 old >= {my_data[8] - age_difference})) AND
                 (loc_lat <= {my_data[10] + 0.01} AND loc_lat >= {my_data[10] - 0.01} AND
@@ -51,9 +54,10 @@ def conditions_select_3(my_data, sms, age_difference):  # Нужно оптим�
 
 
 def conditions_select_4(my_data, sms, age_difference):  # Нужно оптимизировать
-    return f'''(sex == {my_data[6]} AND location_no == "000" AND
+    print(4)
+    return f'''sex == {my_data[6]} AND location_no == "000" AND
                 (sex_poisc == {my_data[2]} OR sex_poisc == 3) AND
-                id != {sms.chat.id}) AND                           
+                id != {sms.chat.id} AND                           
                 (old == {my_data[8]} OR (old <= {my_data[8] + age_difference} AND
                 old >= {my_data[8] - age_difference})) AND
                 (loc_lat <= {my_data[10] + 0.01} AND loc_lat >= {my_data[10] - 0.01} AND

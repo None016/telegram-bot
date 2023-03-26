@@ -100,6 +100,7 @@ async def recommendations(sms):
             for i in range(6):  # заполняет стек новыми людьми
                 us = random.randint(0, len(data) - 1)
                 counter = 0
+
                 while data[us][0] == sms.chat.id or data[us][0] in gl.user_keys3[f"{sms.chat.id}"][0]:
                     counter += 1
                     # Есть баг поправить ^^^^^^^^^^^^
@@ -159,6 +160,8 @@ async def like(sms):  # функция вызывается при нажати�
         data2 = db.SELECT("user", f"id == {sms.chat.id}")[0]
         await gl.bi.bot.send_photo(data[0][0], photo=data2[4],
                                    caption=f"{data2[3]}, {data2[7]}, {data2[8]}\n{data2[5]}")
+        await gl.bi.bot.send_message(data[0][0], f"[Начать диалог](tg://user?id={sms.chat.id})", parse_mode="markdown")
+        await gl.bi.bot.send_message(sms.chat.id, f"[Начать диалог](tg://user?id={data[0][0]})", parse_mode="markdown")
         db.DELETE("like_user", f"id_user2 == {sms.chat.id}")
         del(gl.user_keys3[f"{sms.chat.id}"])  # выводим его из поиска
         if f"{data[0][0]}" in gl.user_keys3.keys():  # выводим его из поиска если от там есть
